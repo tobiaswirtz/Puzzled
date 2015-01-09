@@ -88,7 +88,7 @@ public class Main {
         int xCoord = Integer.parseInt(tmp[0]);
         int yCoord = Integer.parseInt(tmp[1]);
         
-        switch(typeOfObject) {
+        switch(typeOfObject) {                                              //creates the objects for each type of obstacle/object
             case 0:
                 new Wall(xCoord, yCoord);
                 break;
