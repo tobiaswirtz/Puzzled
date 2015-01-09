@@ -32,6 +32,6 @@ public class DynamicObstacle {
     public DynamicObstacle(int x, int y) {
         xCoord = x;
         yCoord = y;
-        Main.putChar('\u3244', x, y);
+        TextModification.putChar('\u3244', x, y);
     }
 }

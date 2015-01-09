@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package puzzled;
 
 import com.googlecode.lanterna.TerminalFacade;
@@ -18,37 +13,46 @@ import java.util.Set;
 public class Main {
     
     static SwingTerminal terminal;
-    static int width;
-    static int height;
+    static int widthMaze;
+    static int heightMaze;
+    static int widthTerminal;
+    static int heightTerminal;
+    static String levelName = "Level.properties";
+    static int gameState = 0;
+    
     
     public static void main(String[] args) throws Exception {
+        
         terminal = TerminalFacade.createSwingTerminal();
+        terminal.setCursorVisible(false);
         terminal.enterPrivateMode();
-        TerminalSize size = terminal.getTerminalSize();
-        terminal.applyForegroundColor(Terminal.Color.RED);
+        TerminalSize screenSize = terminal.getTerminalSize();
         terminal.applyBackgroundColor(Terminal.Color.BLACK);
-        readLevel();
-        
+        widthTerminal = screenSize.getColumns();
+        heightTerminal = screenSize.getRows();
+
         //sets up Window
+        if(gameState == 0) {
+            new MainMenu();
+        }
+        else if(gameState == 1) {
+            readLevel(levelName);
+            TextModification.printToTerminal("Level was read!" + widthTerminal + " " + heightTerminal, widthMaze + 1, heightMaze + 1);
+        }
+        
         
     }
-    
-    //allows for insertion of character at coordinates x, y
-    
-    public static void putChar(char input, int x, int y) {
-        terminal.moveCursor(x, y);
-        terminal.putCharacter(input);
-    }
+
     
     //reads level information in and processes it
     
-    public static void readLevel() throws Exception {
+    public static void readLevel(String level) throws Exception {
         
         Set mapSet;
         Object[] tmp;
         String[] mapArray;
         
-        try (FileReader reader = new FileReader("Level.properties")) {      //opening file stream
+        try (FileReader reader = new FileReader(level)) {      //opening file stream
             Properties properties = new Properties();                       
             properties.load(reader);                                        //filling properties object with output of "stream"
             Enumeration em = properties.keys();
@@ -63,10 +67,10 @@ public class Main {
             for(int index = 0; index < mapArray.length; index++) {
                 if(mapArray[index].contains("Width") == true) {             //catches special case "Width" in properties file
                     String[] tmpString = mapArray[index].split("=");
-                    width = Integer.parseInt(tmpString[1]);
+                    widthMaze = Integer.parseInt(tmpString[1]);
                 } else if(mapArray[index].contains("Height") == true) {     //catches special case "Height" in properties file
                     String[] tmpString = mapArray[index].split("=");
-                    height = Integer.parseInt(tmpString[1]);
+                    heightMaze = Integer.parseInt(tmpString[1]);
                 }
                 else {                                                      //initializes Objects for every other Hash Map entry
                     initObject(mapArray[index]);

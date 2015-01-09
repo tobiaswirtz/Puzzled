@@ -13,7 +13,7 @@ public class Wall {
     public Wall(int x, int y) {
         xCoord = x;
         yCoord = y;
-        Main.putChar('X', x, y);
+        TextModification.putChar('X', x, y);
     }
     
 }

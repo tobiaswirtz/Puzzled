@@ -14,7 +14,7 @@ public class KeyObj {
         
         xCoord = x;
         yCoord = y;
-        Main.putChar('\u1A57', x, y);
+        TextModification.putChar('\u1A57', x, y);
         
     }
     
