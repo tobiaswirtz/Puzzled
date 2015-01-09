@@ -14,7 +14,7 @@ public class Exit {
         
         xCoord = x;
         yCoord = y;
-        
+        Main.putChar('\u2023', x, y);
     }
     
 }

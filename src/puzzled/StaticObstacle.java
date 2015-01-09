@@ -14,7 +14,7 @@ public class StaticObstacle {
         
         xCoord = x;
         yCoord = y;
-        
+        Main.putChar('\u2268', x, y);
     }
     
 }
