@@ -1,10 +1,12 @@
 package puzzled;
 
 import com.googlecode.lanterna.TerminalFacade;
+import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.TerminalSize;
 import com.googlecode.lanterna.terminal.swing.SwingTerminal;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -19,23 +21,32 @@ public class Main {
     static int heightTerminal;
     static String levelName = "Level.properties";
     static int gameState = 0;
+    static Screen screen;
     
+    static ArrayList walls;
+    static ArrayList staticObstacles;
+    static ArrayList dynamicObstacles;
+    static ArrayList keys;
     
     public static void main(String[] args) throws Exception {
         
         terminal = TerminalFacade.createSwingTerminal();
         terminal.setCursorVisible(false);
-        terminal.enterPrivateMode();
+        
         TerminalSize screenSize = terminal.getTerminalSize();
+        screen = TerminalFacade.createScreen();
         terminal.applyBackgroundColor(Terminal.Color.BLACK);
         widthTerminal = screenSize.getColumns();
         heightTerminal = screenSize.getRows();
 
         //sets up Window
         if(gameState == 0) {
+            //terminal.enterPrivateMode();
             new MainMenu();
+            terminal.enterPrivateMode();
         }
         else if(gameState == 1) {
+            terminal.enterPrivateMode();
             readLevel(levelName);
             TextModification.printToTerminal("Level was read!" + widthTerminal + " " + heightTerminal, widthMaze + 1, heightMaze + 1);
         }
@@ -98,6 +109,7 @@ public class Main {
                 break;
             case 1:
                 new Entrance(xCoord, yCoord);
+                new Hero(xCoord, yCoord);
                 break;
             case 2:
                 new Exit(xCoord, yCoord);
