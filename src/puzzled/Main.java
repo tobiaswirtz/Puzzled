@@ -23,10 +23,8 @@ public class Main {
     static int gameState = 0;
     static Screen screen;
     
-    static ArrayList walls;
-    static ArrayList staticObstacles;
-    static ArrayList dynamicObstacles;
-    static ArrayList keys;
+    static Object[][] maze;
+    
     
     public static void main(String[] args) throws Exception {
         
@@ -88,6 +86,8 @@ public class Main {
                 }
             }
             
+            maze = new Object[widthMaze][heightMaze];
+            
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -105,23 +105,41 @@ public class Main {
         
         switch(typeOfObject) {                                              //creates the objects for each type of obstacle/object
             case 0:
-                new Wall(xCoord, yCoord);
+                maze[xCoord][yCoord] = new Wall(xCoord, yCoord);
                 break;
             case 1:
-                new Entrance(xCoord, yCoord);
-                new Hero(xCoord, yCoord);
+                maze[xCoord][yCoord] = new Entrance(xCoord, yCoord);
+                maze[xCoord][yCoord] = new Hero(xCoord, yCoord);
                 break;
             case 2:
-                new Exit(xCoord, yCoord);
+                maze[xCoord][yCoord] = new Exit(xCoord, yCoord);
                 break;
             case 3:
-                new StaticObstacle(xCoord, yCoord);
+                maze[xCoord][yCoord] = new StaticObstacle(xCoord, yCoord);
                 break;
             case 4:
-                new DynamicObstacle(xCoord, yCoord);
+                maze[xCoord][yCoord] = new DynamicObstacle(xCoord, yCoord);
                 break;
             case 5:
-                new KeyObj(xCoord,yCoord);
+                maze[xCoord][yCoord] = new KeyObj(xCoord,yCoord);
+                break;
+        }
+    }
+    
+    public static void updateView() {
+        for(int indexX = 0; indexX < widthMaze; indexX++) {
+            for(int indexY = 0; indexX < heightMaze; indexY++) {
+                if(maze[indexX][indexY] instanceof Wall) {
+                    TextModification.putChar('X', indexX, indexY);
+                }
+                else if(maze[indexX][indexY] instanceof Entrance) {
+                    //add char for entrance
+                }
+                else if(maze[indexX][indexY] instanceof Exit) {
+                    TextModification.putChar('\u2023', indexX, indexY);
+                }
+                
+            }
         }
     }
     

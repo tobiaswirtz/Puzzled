@@ -15,8 +15,6 @@ public class StaticObstacle {
         xCoord = x;
         yCoord = y;
         TextModification.putChar('\u2268', x, y);
-        String coordinates = x + "," + y;
-        Main.staticObstacles.add(coordinates);
     }
     
 }

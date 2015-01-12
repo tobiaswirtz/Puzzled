@@ -33,7 +33,5 @@ public class DynamicObstacle {
         xCoord = x;
         yCoord = y;
         TextModification.putChar('\u3244', x, y);
-        String coordinates = x + "," + y;
-        Main.dynamicObstacles.add(coordinates);
     }
 }
