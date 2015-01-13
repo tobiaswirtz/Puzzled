@@ -20,11 +20,12 @@ public class Main {
     static int widthTerminal;
     static int heightTerminal;
     static String levelName = "Level.properties";
-    static int gameState = 0;
+    static int gameState = 1;
     static Screen screen;
     
     static Object[][] maze;
-    
+    static ArrayList dynamicObjs = new ArrayList(50);
+    static String[] mapArray;
     
     public static void main(String[] args) throws Exception {
         
@@ -46,6 +47,8 @@ public class Main {
         else if(gameState == 1) {
             terminal.enterPrivateMode();
             readLevel(levelName);
+            drawView();
+            
             TextModification.printToTerminal("Level was read!" + widthTerminal + " " + heightTerminal, widthMaze + 1, heightMaze + 1);
         }
         
@@ -59,12 +62,14 @@ public class Main {
         
         Set mapSet;
         Object[] tmp;
-        String[] mapArray;
+        ArrayList<String> tmpList;
+        
         
         try (FileReader reader = new FileReader(level)) {      //opening file stream
             Properties properties = new Properties();                       
             properties.load(reader);                                        //filling properties object with output of "stream"
             Enumeration em = properties.keys();
+            tmpList = new ArrayList(properties.size());
             mapSet = properties.entrySet();
             tmp = mapSet.toArray();
             mapArray = new String[tmp.length];
@@ -77,16 +82,22 @@ public class Main {
                 if(mapArray[index].contains("Width") == true) {             //catches special case "Width" in properties file
                     String[] tmpString = mapArray[index].split("=");
                     widthMaze = Integer.parseInt(tmpString[1]);
+                    System.out.println(widthMaze);
                 } else if(mapArray[index].contains("Height") == true) {     //catches special case "Height" in properties file
                     String[] tmpString = mapArray[index].split("=");
                     heightMaze = Integer.parseInt(tmpString[1]);
+                    System.out.println(heightMaze);
                 }
                 else {                                                      //initializes Objects for every other Hash Map entry
-                    initObject(mapArray[index]);
+                    tmpList.add(mapArray[index]);
                 }
             }
             
             maze = new Object[widthMaze][heightMaze];
+            
+            for(int index = 0; index < tmpList.size(); index++) {
+                initObject(tmpList.get(index));
+            }
             
         } catch(Exception e) {
             e.printStackTrace();
@@ -118,7 +129,10 @@ public class Main {
                 maze[xCoord][yCoord] = new StaticObstacle(xCoord, yCoord);
                 break;
             case 4:
-                maze[xCoord][yCoord] = new DynamicObstacle(xCoord, yCoord);
+                DynamicObstacle aux = new DynamicObstacle(xCoord, yCoord);
+                maze[xCoord][yCoord] = aux;
+                dynamicObjs.add(aux);
+                System.out.println(Arrays.toString(dynamicObjs.toArray()));
                 break;
             case 5:
                 maze[xCoord][yCoord] = new KeyObj(xCoord,yCoord);
@@ -126,9 +140,11 @@ public class Main {
         }
     }
     
-    public static void updateView() {
+    public static void drawView() {
+ 
         for(int indexX = 0; indexX < widthMaze; indexX++) {
-            for(int indexY = 0; indexX < heightMaze; indexY++) {
+            for(int indexY = 0; indexY < heightMaze; indexY++) {
+                
                 if(maze[indexX][indexY] instanceof Wall) {
                     TextModification.putChar('X', indexX, indexY);
                 }
@@ -137,6 +153,18 @@ public class Main {
                 }
                 else if(maze[indexX][indexY] instanceof Exit) {
                     TextModification.putChar('\u2023', indexX, indexY);
+                }
+                else if(maze[indexX][indexY] instanceof Hero) {
+                    //add char for Hero
+                }
+                else if(maze[indexX][indexY] instanceof KeyObj) {
+                    TextModification.putChar('\u1A57', indexX, indexY);
+                }
+                else if(maze[indexX][indexY] instanceof StaticObstacle) {
+                    TextModification.putChar('\u2268', indexX, indexY);
+                }
+                else if(maze[indexX][indexY] instanceof DynamicObstacle) {
+                    TextModification.putChar('\u3244', indexX, indexY);
                 }
                 
             }
