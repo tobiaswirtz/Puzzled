@@ -22,10 +22,16 @@ public class Main {
     static String levelName = "Level.properties";
     static int gameState = 1;
     static Screen screen;
+    static int xZero;
+    static int upperX;
+    static int yZero;
+    static int upperY;
     
     static Object[][] maze;
     static ArrayList dynamicObjs = new ArrayList(50);
     static String[] mapArray;
+    
+    static Hero hero;
     
     public static void main(String[] args) throws Exception {
         
@@ -48,8 +54,12 @@ public class Main {
             terminal.enterPrivateMode();
             readLevel(levelName);
             drawView();
+            GameControls control = new GameControls();
+            while(true) {
+                control.readKeyInput();
+                updateView();
+            }
             
-            TextModification.printToTerminal("Level was read!" + widthTerminal + " " + heightTerminal, widthMaze + 1, heightMaze + 1);
         }
         
         
@@ -82,11 +92,9 @@ public class Main {
                 if(mapArray[index].contains("Width") == true) {             //catches special case "Width" in properties file
                     String[] tmpString = mapArray[index].split("=");
                     widthMaze = Integer.parseInt(tmpString[1]);
-                    System.out.println(widthMaze);
                 } else if(mapArray[index].contains("Height") == true) {     //catches special case "Height" in properties file
                     String[] tmpString = mapArray[index].split("=");
                     heightMaze = Integer.parseInt(tmpString[1]);
-                    System.out.println(heightMaze);
                 }
                 else {                                                      //initializes Objects for every other Hash Map entry
                     tmpList.add(mapArray[index]);
@@ -105,70 +113,86 @@ public class Main {
     }
     
     public static void initObject(String setInput) {
+        
+        if(widthMaze < widthTerminal && heightMaze < heightTerminal) {
+            xZero = (widthTerminal / 2) - (widthMaze / 2);
+            yZero = (heightTerminal / 2) - (heightMaze / 2);
+        } else {
+            xZero = 0;
+            yZero = 0;
+        }
+        
+        upperX = xZero + widthMaze;
+        upperY = yZero + heightMaze;
+        
         String[] tmp = setInput.split("=");
         
         int typeOfObject = Integer.parseInt(tmp[1]);                        //gets number of object to place at x, y
         
         tmp = tmp[0].split(",");                                            //separates x and y coordinates
         
-        int xCoord = Integer.parseInt(tmp[0]);
-        int yCoord = Integer.parseInt(tmp[1]);
+        int xCoord = Integer.parseInt(tmp[0]) + xZero;
+        int yCoord = Integer.parseInt(tmp[1]) + yZero;
         
         switch(typeOfObject) {                                              //creates the objects for each type of obstacle/object
             case 0:
-                maze[xCoord][yCoord] = new Wall(xCoord, yCoord);
+                maze[xCoord - xZero][yCoord - yZero] = new Wall(xCoord, yCoord);
                 break;
             case 1:
-                maze[xCoord][yCoord] = new Entrance(xCoord, yCoord);
-                maze[xCoord][yCoord] = new Hero(xCoord, yCoord);
+                maze[xCoord - xZero][yCoord - yZero] = new Entrance(xCoord, yCoord);
+                hero = new Hero(xCoord - xZero, yCoord - yZero);
+                maze[xCoord - xZero][yCoord - yZero] = hero;
                 break;
             case 2:
-                maze[xCoord][yCoord] = new Exit(xCoord, yCoord);
+                maze[xCoord - xZero][yCoord - yZero] = new Exit(xCoord, yCoord);
                 break;
             case 3:
-                maze[xCoord][yCoord] = new StaticObstacle(xCoord, yCoord);
+                maze[xCoord - xZero][yCoord - yZero] = new StaticObstacle(xCoord, yCoord);
                 break;
             case 4:
                 DynamicObstacle aux = new DynamicObstacle(xCoord, yCoord);
-                maze[xCoord][yCoord] = aux;
+                maze[xCoord - xZero][yCoord - yZero] = aux;
                 dynamicObjs.add(aux);
-                System.out.println(Arrays.toString(dynamicObjs.toArray()));
                 break;
             case 5:
-                maze[xCoord][yCoord] = new KeyObj(xCoord,yCoord);
+                maze[xCoord - xZero][yCoord - yZero] = new KeyObj(xCoord,yCoord);
                 break;
         }
     }
     
     public static void drawView() {
- 
-        for(int indexX = 0; indexX < widthMaze; indexX++) {
-            for(int indexY = 0; indexY < heightMaze; indexY++) {
+        
+        for(int indexX = xZero; indexX < upperX; indexX++) {
+            for(int indexY = yZero; indexY < upperY; indexY++) {
                 
-                if(maze[indexX][indexY] instanceof Wall) {
+                if(maze[indexX-xZero][indexY-yZero] instanceof Wall) {
                     TextModification.putChar('X', indexX, indexY);
                 }
-                else if(maze[indexX][indexY] instanceof Entrance) {
+                else if(maze[indexX-xZero][indexY-yZero] instanceof Entrance) {
                     //add char for entrance
                 }
-                else if(maze[indexX][indexY] instanceof Exit) {
+                else if(maze[indexX-xZero][indexY-yZero] instanceof Exit) {
                     TextModification.putChar('\u2023', indexX, indexY);
                 }
-                else if(maze[indexX][indexY] instanceof Hero) {
-                    //add char for Hero
+                else if(maze[indexX-xZero][indexY-yZero] instanceof Hero) {
+                    TextModification.putChar('\u265B', indexX, indexY);
                 }
-                else if(maze[indexX][indexY] instanceof KeyObj) {
+                else if(maze[indexX-xZero][indexY-yZero] instanceof KeyObj) {
                     TextModification.putChar('\u1A57', indexX, indexY);
                 }
-                else if(maze[indexX][indexY] instanceof StaticObstacle) {
+                else if(maze[indexX-xZero][indexY-yZero] instanceof StaticObstacle) {
                     TextModification.putChar('\u2268', indexX, indexY);
                 }
-                else if(maze[indexX][indexY] instanceof DynamicObstacle) {
+                else if(maze[indexX-xZero][indexY-yZero] instanceof DynamicObstacle) {
                     TextModification.putChar('\u3244', indexX, indexY);
                 }
                 
             }
         }
+    }
+    
+    public static void updateView() {
+        TextModification.putChar('\u265B', hero.getxCoord(), hero.getyCoord());
     }
     
 }
