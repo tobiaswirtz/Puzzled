@@ -26,6 +26,10 @@ public class Main {
     static int upperX;
     static int yZero;
     static int upperY;
+    static int lives = 3;
+    static int keysCollected = 0;
+    static int keysOfLevel;
+    static boolean levelFinished;
     
     static Object[][] maze;
     static ArrayList dynamicObjs = new ArrayList(50);
@@ -46,7 +50,6 @@ public class Main {
 
         //sets up Window
         if(gameState == 0) {
-            //terminal.enterPrivateMode();
             new MainMenu();
             terminal.enterPrivateMode();
         }
@@ -112,18 +115,9 @@ public class Main {
         }
     }
     
+    //initializes objects to @param maze
+    
     public static void initObject(String setInput) {
-        
-        if(widthMaze < widthTerminal && heightMaze < heightTerminal) {
-            xZero = (widthTerminal / 2) - (widthMaze / 2);
-            yZero = (heightTerminal / 2) - (heightMaze / 2);
-        } else {
-            xZero = 0;
-            yZero = 0;
-        }
-        
-        upperX = xZero + widthMaze;
-        upperY = yZero + heightMaze;
         
         String[] tmp = setInput.split("=");
         
@@ -131,36 +125,50 @@ public class Main {
         
         tmp = tmp[0].split(",");                                            //separates x and y coordinates
         
-        int xCoord = Integer.parseInt(tmp[0]) + xZero;
-        int yCoord = Integer.parseInt(tmp[1]) + yZero;
+        int xCoord = Integer.parseInt(tmp[0]);
+        int yCoord = Integer.parseInt(tmp[1]);
         
         switch(typeOfObject) {                                              //creates the objects for each type of obstacle/object
             case 0:
-                maze[xCoord - xZero][yCoord - yZero] = new Wall(xCoord, yCoord);
+                maze[xCoord][yCoord] = new Wall(xCoord, yCoord);
                 break;
             case 1:
-                maze[xCoord - xZero][yCoord - yZero] = new Entrance(xCoord, yCoord);
-                hero = new Hero(xCoord - xZero, yCoord - yZero);
-                maze[xCoord - xZero][yCoord - yZero] = hero;
+                maze[xCoord][yCoord] = new Entrance(xCoord, yCoord);
+                hero = new Hero(xCoord, yCoord);
+                maze[xCoord][yCoord] = hero;
                 break;
             case 2:
-                maze[xCoord - xZero][yCoord - yZero] = new Exit(xCoord, yCoord);
+                maze[xCoord][yCoord] = new Exit(xCoord, yCoord);
                 break;
             case 3:
-                maze[xCoord - xZero][yCoord - yZero] = new StaticObstacle(xCoord, yCoord);
+                maze[xCoord][yCoord] = new StaticObstacle(xCoord, yCoord);
                 break;
             case 4:
                 DynamicObstacle aux = new DynamicObstacle(xCoord, yCoord);
-                maze[xCoord - xZero][yCoord - yZero] = aux;
+                maze[xCoord][yCoord] = aux;
                 dynamicObjs.add(aux);
                 break;
             case 5:
-                maze[xCoord - xZero][yCoord - yZero] = new KeyObj(xCoord,yCoord);
+                maze[xCoord][yCoord] = new KeyObj(xCoord,yCoord);
+                keysOfLevel++;
                 break;
         }
     }
     
+    //initializes the view on the terminal layer
+    
     public static void drawView() {
+        
+        if(widthMaze < widthTerminal && heightMaze < heightTerminal) {
+            xZero = (widthTerminal / 2) - (widthMaze / 2);
+            yZero = (heightTerminal / 2) - (heightMaze / 2);
+        } else {
+            xZero = 0;
+            yZero = 1;
+        }
+        
+        upperX = xZero + widthMaze;
+        upperY = yZero + heightMaze;
         
         for(int indexX = xZero; indexX < upperX; indexX++) {
             for(int indexY = yZero; indexY < upperY; indexY++) {
@@ -172,7 +180,7 @@ public class Main {
                     //add char for entrance
                 }
                 else if(maze[indexX-xZero][indexY-yZero] instanceof Exit) {
-                    TextModification.putChar('\u2023', indexX, indexY);
+                    //TextModification.putChar('\u2023', indexX, indexY);
                 }
                 else if(maze[indexX-xZero][indexY-yZero] instanceof Hero) {
                     TextModification.putChar('\u265B', indexX, indexY);
@@ -191,8 +199,22 @@ public class Main {
         }
     }
     
-    public static void updateView() {
-        TextModification.putChar('\u265B', hero.getxCoord(), hero.getyCoord());
+    //updates positions in @param maze of moving objects and displays them on the terminal
+    
+    public static void updateView() throws Exception{
+        
+        TextModification.putChar('\u265B', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+        TextModification.printToTerminal("Lives left: " + lives, 1, 0);
+        TextModification.printToTerminal("Keys collected: " + keysCollected + "/" + keysOfLevel, 16, 0);
+        
+        if(lives == 0) {
+            gameState = 0;
+        }
+        if(levelFinished == true) {
+            Thread.sleep(250);
+            terminal.clearScreen();
+            TextModification.printToTerminal("Level done! Congratulations!", TextModification.xCentered(28), heightTerminal/2);
+        }
     }
     
 }
