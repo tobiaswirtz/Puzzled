@@ -3,6 +3,7 @@ package puzzled;
 import com.googlecode.lanterna.TerminalFacade;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.Terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.TerminalSize;
 import com.googlecode.lanterna.terminal.swing.SwingTerminal;
 import java.io.FileReader;
@@ -12,7 +13,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 
-public class Main {
+public class Main implements ResizeListener {
     
     static SwingTerminal terminal;
     static int widthMaze;
@@ -30,6 +31,7 @@ public class Main {
     static int keysCollected = 0;
     static int keysOfLevel;
     static boolean levelFinished;
+    static TerminalSize screenSize;
     
     static Object[][] maze;
     static ArrayList dynamicObjs = new ArrayList(50);
@@ -42,7 +44,7 @@ public class Main {
         terminal = TerminalFacade.createSwingTerminal();
         terminal.setCursorVisible(false);
         
-        TerminalSize screenSize = terminal.getTerminalSize();
+        screenSize = terminal.getTerminalSize();
         screen = TerminalFacade.createScreen();
         terminal.applyBackgroundColor(Terminal.Color.BLACK);
         widthTerminal = screenSize.getColumns();
@@ -215,6 +217,11 @@ public class Main {
             terminal.clearScreen();
             TextModification.printToTerminal("Level done! Congratulations!", TextModification.xCentered(28), heightTerminal/2);
         }
+    }
+    
+    @Override
+    public void onResized(TerminalSize newSize) {
+        //TODO
     }
     
 }

@@ -1,7 +1,9 @@
 
 package puzzled;
 
+import static puzzled.Main.heightTerminal;
 import static puzzled.Main.terminal;
+import static puzzled.Main.widthTerminal;
 
 public class TextModification {
     
@@ -29,5 +31,13 @@ public class TextModification {
         int centerOfTerminal = Main.widthTerminal / 2;
         int halfOfString = stringLength / 2;
         return centerOfTerminal - halfOfString;
+    }
+    
+    public static void resizeTerminal() {
+        
+        if(widthTerminal != 100 || heightTerminal != 30) {
+            Main.drawView();
+        }
+        
     }
 }

@@ -10,7 +10,7 @@ import com.googlecode.lanterna.terminal.swing.SwingTerminal;
 import static puzzled.Main.screen;
 import static puzzled.Main.terminal;
 
-public class MainMenu {
+public class MainMenu{
     
     int cursorPos = 10;
     
