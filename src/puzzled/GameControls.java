@@ -37,34 +37,34 @@ public class GameControls {
             } else if (Main.gameState == 1) {
                 switch (keyPressed.getKind()) {
                     case ArrowDown:
-                        if (checkField(hero.getxCoord(), hero.getyCoord() + 1) == 2 || checkField(hero.getxCoord(), hero.getyCoord() + 1) == 4) {
-                            TextModification.putChar('\u0020', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+                        if (checkField(hero.getxCoord(), hero.getyCoord()) == 2 || checkField(hero.getxCoord(), hero.getyCoord()) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
                             hero.setyCoord(hero.getyCoord() + 1);
-                        } else if (checkField(hero.getxCoord(), hero.getyCoord() + 1) == 1 || checkField(hero.getxCoord(), hero.getyCoord() + 1) == 3) {
+                        } else if (checkField(hero.getxCoord(), hero.getyCoord()) == 1 || checkField(hero.getxCoord(), hero.getyCoord()) == 3) {
                             lives--;
                         }
                         break;
                     case ArrowUp:
-                        if (checkField(hero.getxCoord(), hero.getyCoord() - 1) == 2 || checkField(hero.getxCoord(), hero.getyCoord() - 1) == 4) {
-                            TextModification.putChar('\u0020', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+                        if (checkField(hero.getxCoord(), hero.getyCoord() - 2) == 2 || checkField(hero.getxCoord(), hero.getyCoord() - 2) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
                             hero.setyCoord(hero.getyCoord() - 1);
-                        } else if (checkField(hero.getxCoord(), hero.getyCoord() - 1) == 1 || checkField(hero.getxCoord(), hero.getyCoord() - 1) == 3) {
+                        } else if (checkField(hero.getxCoord(), hero.getyCoord() - 2) == 1 || checkField(hero.getxCoord(), hero.getyCoord() - 2) == 3) {
                             lives--;
                         }
                         break;
                     case ArrowLeft:
-                        if (checkField(hero.getxCoord() - 1, hero.getyCoord()) == 2 || checkField(hero.getxCoord() - 1, hero.getyCoord()) == 4) {
-                            TextModification.putChar('\u0020', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+                        if (checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 2 || checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
                             hero.setxCoord(hero.getxCoord() - 1);
-                        } else if (checkField(hero.getxCoord() - 1, hero.getyCoord()) == 1 || checkField(hero.getxCoord() - 1, hero.getyCoord()) == 3) {
+                        } else if (checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 1 || checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 3) {
                             lives--;
                         }
                         break;
                     case ArrowRight:
-                        if (checkField(hero.getxCoord() + 1, hero.getyCoord()) == 2 || checkField(hero.getxCoord() + 1, hero.getyCoord()) == 4) {
-                            TextModification.putChar('\u0020', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+                        if (checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 2 || checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
                             hero.setxCoord(hero.getxCoord() + 1);
-                        } else if (checkField(hero.getxCoord() + 1, hero.getyCoord()) == 1 || checkField(hero.getxCoord() + 1, hero.getyCoord()) == 3) {
+                        } else if (checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 1 || checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 3) {
                             lives--;
                         }
                         break;

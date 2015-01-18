@@ -14,13 +14,13 @@ import java.util.Properties;
 import java.util.Set;
 
 public class Main implements ResizeListener {
-    
+
     static SwingTerminal terminal;
     static int widthMaze;
     static int heightMaze;
     static int widthTerminal;
     static int heightTerminal;
-    static String levelName = "Level.properties";
+    static String levelName = "Level1.properties";
     static int gameState = 1;
     static Screen screen;
     static int xZero;
@@ -32,18 +32,18 @@ public class Main implements ResizeListener {
     static int keysOfLevel;
     static boolean levelFinished;
     static TerminalSize screenSize;
-    
+
     static Object[][] maze;
     static ArrayList dynamicObjs = new ArrayList(50);
     static String[] mapArray;
-    
+
     static Hero hero;
-    
+
     public static void main(String[] args) throws Exception {
-        
+
         terminal = TerminalFacade.createSwingTerminal();
         terminal.setCursorVisible(false);
-        
+
         screenSize = terminal.getTerminalSize();
         screen = TerminalFacade.createScreen();
         terminal.applyBackgroundColor(Terminal.Color.BLACK);
@@ -51,86 +51,79 @@ public class Main implements ResizeListener {
         heightTerminal = screenSize.getRows();
 
         //sets up Window
-        if(gameState == 0) {
+        if (gameState == 0) {
             new MainMenu();
             terminal.enterPrivateMode();
-        }
-        else if(gameState == 1) {
+        } else if (gameState == 1) {
             terminal.enterPrivateMode();
             readLevel(levelName);
             drawView();
             GameControls control = new GameControls();
-            while(true) {
+            while (true) {
                 control.readKeyInput();
                 updateView();
             }
-            
+
         }
-        
-        
+
     }
 
-    
     //reads level information in and processes it
-    
     public static void readLevel(String level) throws Exception {
-        
+
         Set mapSet;
         Object[] tmp;
         ArrayList<String> tmpList;
-        
-        
+
         try (FileReader reader = new FileReader(level)) {      //opening file stream
-            Properties properties = new Properties();                       
+            Properties properties = new Properties();
             properties.load(reader);                                        //filling properties object with output of "stream"
             Enumeration em = properties.keys();
             tmpList = new ArrayList(properties.size());
             mapSet = properties.entrySet();
             tmp = mapSet.toArray();
             mapArray = new String[tmp.length];
-            
-            for(int index = 0; index < tmp.length; index++) {
+
+            for (int index = 0; index < tmp.length; index++) {
                 mapArray[index] = tmp[index].toString();                      //casting Object[] tmp to String[] mapArray
             }
-            
-            for(int index = 0; index < mapArray.length; index++) {
-                if(mapArray[index].contains("Width") == true) {             //catches special case "Width" in properties file
+
+            for (int index = 0; index < mapArray.length; index++) {
+                if (mapArray[index].contains("Width") == true) {             //catches special case "Width" in properties file
                     String[] tmpString = mapArray[index].split("=");
                     widthMaze = Integer.parseInt(tmpString[1]);
-                } else if(mapArray[index].contains("Height") == true) {     //catches special case "Height" in properties file
+                } else if (mapArray[index].contains("Height") == true) {     //catches special case "Height" in properties file
                     String[] tmpString = mapArray[index].split("=");
                     heightMaze = Integer.parseInt(tmpString[1]);
-                }
-                else {                                                      //initializes Objects for every other Hash Map entry
+                } else {                                                      //initializes Objects for every other Hash Map entry
                     tmpList.add(mapArray[index]);
                 }
             }
-            
+
             maze = new Object[widthMaze][heightMaze];
-            
-            for(int index = 0; index < tmpList.size(); index++) {
+
+            for (int index = 0; index < tmpList.size(); index++) {
                 initObject(tmpList.get(index));
             }
-            
-        } catch(Exception e) {
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
     //initializes objects to @param maze
-    
     public static void initObject(String setInput) {
-        
+
         String[] tmp = setInput.split("=");
-        
+
         int typeOfObject = Integer.parseInt(tmp[1]);                        //gets number of object to place at x, y
-        
+
         tmp = tmp[0].split(",");                                            //separates x and y coordinates
-        
+
         int xCoord = Integer.parseInt(tmp[0]);
         int yCoord = Integer.parseInt(tmp[1]);
-        
-        switch(typeOfObject) {                                              //creates the objects for each type of obstacle/object
+
+        switch (typeOfObject) {                                              //creates the objects for each type of obstacle/object
             case 0:
                 maze[xCoord][yCoord] = new Wall(xCoord, yCoord);
                 break;
@@ -151,77 +144,135 @@ public class Main implements ResizeListener {
                 dynamicObjs.add(aux);
                 break;
             case 5:
-                maze[xCoord][yCoord] = new KeyObj(xCoord,yCoord);
+                maze[xCoord][yCoord] = new KeyObj(xCoord, yCoord);
                 keysOfLevel++;
                 break;
         }
     }
-    
+
     //initializes the view on the terminal layer
-    
     public static void drawView() {
-        
-        if(widthMaze < widthTerminal && heightMaze < heightTerminal) {
+
+        if (widthMaze < widthTerminal && heightMaze < heightTerminal) {
             xZero = (widthTerminal / 2) - (widthMaze / 2);
             yZero = (heightTerminal / 2) - (heightMaze / 2);
-        } else {
+        } else if (hero.getxCoord() - (widthTerminal / 2) <= 0) {
             xZero = 0;
             yZero = 1;
+        } else {
+            xZero = hero.getxCoord() - (widthTerminal / 2);
+            yZero = 1;
         }
-        
-        upperX = xZero + widthMaze;
-        upperY = yZero + heightMaze;
-        
-        for(int indexX = xZero; indexX < upperX; indexX++) {
-            for(int indexY = yZero; indexY < upperY; indexY++) {
-                
-                if(maze[indexX-xZero][indexY-yZero] instanceof Wall) {
-                    TextModification.putChar('X', indexX, indexY);
+
+        for (int indexX = 0; indexX < widthTerminal; indexX++) {
+            for (int indexY = 0; indexY < heightTerminal; indexY++) {
+
+                if (maze[indexX + xZero][indexY - 1 + yZero] instanceof Wall) {
+                    TextModification.putChar('X', indexX, indexY + 1);
+                } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof Entrance) {
+                    TextModification.putChar('E', indexX, indexY + 1);
+                } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof Exit) {
+                    TextModification.putChar('\u2023', indexX, indexY + 1);
+                } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof Hero) {
+                    TextModification.putChar('\u265B', indexX, indexY + 1);
+                } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof KeyObj) {
+                    TextModification.putChar('\u1A57', indexX, indexY + 1);
+                } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof StaticObstacle) {
+                    TextModification.putChar('\u2268', indexX, indexY + 1);
+                } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof DynamicObstacle) {
+                    TextModification.putChar('\u3244', indexX, indexY + 1);
                 }
-                else if(maze[indexX-xZero][indexY-yZero] instanceof Entrance) {
-                    //add char for entrance
-                }
-                else if(maze[indexX-xZero][indexY-yZero] instanceof Exit) {
-                    //TextModification.putChar('\u2023', indexX, indexY);
-                }
-                else if(maze[indexX-xZero][indexY-yZero] instanceof Hero) {
-                    TextModification.putChar('\u265B', indexX, indexY);
-                }
-                else if(maze[indexX-xZero][indexY-yZero] instanceof KeyObj) {
-                    TextModification.putChar('\u1A57', indexX, indexY);
-                }
-                else if(maze[indexX-xZero][indexY-yZero] instanceof StaticObstacle) {
-                    TextModification.putChar('\u2268', indexX, indexY);
-                }
-                else if(maze[indexX-xZero][indexY-yZero] instanceof DynamicObstacle) {
-                    TextModification.putChar('\u3244', indexX, indexY);
-                }
-                
+
             }
         }
+
     }
-    
+
     //updates positions in @param maze of moving objects and displays them on the terminal
-    
-    public static void updateView() throws Exception{
-        
-        TextModification.putChar('\u265B', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+    public static void updateView() throws Exception {
+
+        if (widthMaze <= widthTerminal && heightMaze <= heightTerminal) {
+            generalUpdateView();
+        } else {
+            drawNewCutout();
+            generalUpdateView();
+        }
+    }
+
+    //updates xZero and yZero and draws a new cutout of the map on the terminal
+    public static void drawNewCutout() {
+
+        int xCoordHero = hero.getxCoord();
+        int yCoordHero = hero.getyCoord();
+        boolean hasChanged = false;
+
+        if (xCoordHero >= xZero + widthTerminal) {
+            xZero = xZero + (widthTerminal - 1);
+            hero.setxCoord(0);
+            hasChanged = true;
+        } else if (xCoordHero < xZero) {
+            xZero = xZero - widthTerminal + 1;
+            hero.setxCoord(widthTerminal - 1);
+            hasChanged = true;
+        } else if (yCoordHero >= yZero + heightTerminal) {
+            yZero = yZero + heightTerminal - 2;
+            hero.setyCoord(2);
+            hasChanged = true;
+        } else if (yCoordHero < yZero) {
+            yZero = yZero - heightTerminal + 2;
+            hero.setyCoord(heightTerminal - 1);
+            hasChanged = true;
+        }
+        try {
+            if (hasChanged == true) {
+                for (int indexX = 0; indexX < widthTerminal; indexX++) {
+                    for (int indexY = 0; indexY < heightTerminal; indexY++) {
+
+                        if (maze[indexX + xZero][indexY - 1 + yZero] instanceof Wall) {
+                            TextModification.putChar('X', indexX, indexY + 1);
+                        } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof Entrance) {
+                            //add char for entrance
+                        } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof Exit) {
+                            TextModification.putChar('\u2023', indexX, indexY + 1);
+                        } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof KeyObj) {
+                            TextModification.putChar('\u1A57', indexX, indexY + 1);
+                        } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof StaticObstacle) {
+                            TextModification.putChar('\u2268', indexX, indexY + 1);
+                        } else if (maze[indexX + xZero][indexY - 1 + yZero] instanceof DynamicObstacle) {
+                            TextModification.putChar('\u3244', indexX, indexY + 1);
+                        } else {
+                            TextModification.putChar('\u0020', indexX, indexY + 1);
+                        }
+
+                    }
+                }
+                hasChanged = false;
+            }
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    //
+    public static void generalUpdateView() throws Exception {
+        TextModification.putChar('\u265B', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
         TextModification.printToTerminal("Lives left: " + lives, 1, 0);
         TextModification.printToTerminal("Keys collected: " + keysCollected + "/" + keysOfLevel, 16, 0);
-        
-        if(lives == 0) {
+
+        if (lives == 0) {
             gameState = 0;
         }
-        if(levelFinished == true) {
+        if (levelFinished == true) {
             Thread.sleep(250);
             terminal.clearScreen();
-            TextModification.printToTerminal("Level done! Congratulations!", TextModification.xCentered(28), heightTerminal/2);
+            TextModification.printToTerminal("Level done! Congratulations!", TextModification.xCentered(28), heightTerminal / 2);
         }
     }
-    
+
     @Override
     public void onResized(TerminalSize newSize) {
         //TODO
     }
-    
+
 }
