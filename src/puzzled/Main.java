@@ -3,7 +3,6 @@ package puzzled;
 import com.googlecode.lanterna.TerminalFacade;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.Terminal.ResizeListener;
 import com.googlecode.lanterna.terminal.TerminalSize;
 import com.googlecode.lanterna.terminal.swing.SwingTerminal;
 import java.io.FileReader;
@@ -13,7 +12,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
 
-public class Main implements ResizeListener {
+public class Main {
 
     static SwingTerminal terminal;
     static int widthMaze;
@@ -32,9 +31,11 @@ public class Main implements ResizeListener {
     static int keysOfLevel;
     static boolean levelFinished;
     static TerminalSize screenSize;
+    static TerminalSize newScreenSize;
+    static boolean normalMovement = true;
 
     static Object[][] maze;
-    static ArrayList dynamicObjs = new ArrayList(50);
+    static ArrayList<DynamicObstacle> dynamicObjs = new ArrayList(50);
     static String[] mapArray;
 
     static Hero hero;
@@ -43,13 +44,15 @@ public class Main implements ResizeListener {
 
         terminal = TerminalFacade.createSwingTerminal();
         terminal.setCursorVisible(false);
-
+        
         screenSize = terminal.getTerminalSize();
         screen = TerminalFacade.createScreen();
         terminal.applyBackgroundColor(Terminal.Color.BLACK);
         widthTerminal = screenSize.getColumns();
         heightTerminal = screenSize.getRows();
-
+        
+        newScreenSize = screenSize;
+        
         //sets up Window
         if (gameState == 0) {
             new MainMenu();
@@ -62,6 +65,11 @@ public class Main implements ResizeListener {
             while (true) {
                 control.readKeyInput();
                 updateView();
+                newScreenSize = terminal.getTerminalSize();
+                if((screenSize.getRows() != newScreenSize.getRows() || (screenSize.getColumns() != newScreenSize.getColumns()))) {
+                    drawNewCutout();
+                    screenSize = newScreenSize;
+                }
             }
 
         }
@@ -189,6 +197,7 @@ public class Main implements ResizeListener {
     }
 
     //updates positions in @param maze of moving objects and displays them on the terminal
+    
     public static void updateView() throws Exception {
 
         if (widthMaze <= widthTerminal && heightMaze <= heightTerminal) {
@@ -200,27 +209,27 @@ public class Main implements ResizeListener {
     }
 
     //updates xZero and yZero and draws a new cutout of the map on the terminal
+    
     public static void drawNewCutout() {
 
         int xCoordHero = hero.getxCoord();
         int yCoordHero = hero.getyCoord();
+        widthTerminal = newScreenSize.getColumns();
+        heightTerminal = newScreenSize.getRows();
+        
         boolean hasChanged = false;
 
-        if (xCoordHero >= xZero + widthTerminal) {
+        if (xCoordHero > xZero + widthTerminal) {
             xZero = xZero + (widthTerminal - 1);
-            hero.setxCoord(0);
             hasChanged = true;
         } else if (xCoordHero < xZero) {
             xZero = xZero - widthTerminal + 1;
-            hero.setxCoord(widthTerminal - 1);
             hasChanged = true;
         } else if (yCoordHero >= yZero + heightTerminal) {
             yZero = yZero + heightTerminal - 2;
-            hero.setyCoord(2);
             hasChanged = true;
         } else if (yCoordHero < yZero) {
             yZero = yZero - heightTerminal + 2;
-            hero.setyCoord(heightTerminal - 1);
             hasChanged = true;
         }
         try {
@@ -254,12 +263,25 @@ public class Main implements ResizeListener {
 
     }
 
-    //
+    //handles @param hero and mob movements as well as health, keys and gameState
+    
     public static void generalUpdateView() throws Exception {
         TextModification.putChar('\u265B', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
         TextModification.printToTerminal("Lives left: " + lives, 1, 0);
         TextModification.printToTerminal("Keys collected: " + keysCollected + "/" + keysOfLevel, 16, 0);
-
+        
+        for(DynamicObstacle mob : dynamicObjs){
+            if(((mob.getxCoord() - hero.getxCoord()) <= 200)  && (mob.getyCoord() - hero.getyCoord() <= 200)) {
+                normalMovement = false;
+                mob.moveToHero();
+            } else if(((hero.getxCoord() - mob.getxCoord()) <= 200)  && ((hero.getyCoord() - mob.getxCoord()) <= 200)) {
+                normalMovement = false;
+                mob.moveToHero();
+            } else {
+                mob.randomMovement();
+            }
+        }
+        
         if (lives == 0) {
             gameState = 0;
         }
@@ -268,11 +290,6 @@ public class Main implements ResizeListener {
             terminal.clearScreen();
             TextModification.printToTerminal("Level done! Congratulations!", TextModification.xCentered(28), heightTerminal / 2);
         }
-    }
-
-    @Override
-    public void onResized(TerminalSize newSize) {
-        //TODO
     }
 
 }

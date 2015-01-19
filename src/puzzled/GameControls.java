@@ -103,4 +103,49 @@ public class GameControls {
         }
         
     }
+    
+    
+    //checks which degree the node has and returns the value as an integer
+    
+    public int degreeOfNode(int x, int y) {
+        
+        int counter = 0;
+        
+        if(checkField(x + 1, y) == 4) {
+            counter++;
+        }
+        if(checkField(x - 1, y) == 4) {
+            counter++;
+        }
+        if(checkField(x, y + 1) == 4) {
+            counter++;
+        }
+        if(checkField(x, y - 1) == 4) {
+            counter++;
+        }
+        
+        return counter;
+    }
+    
+    
+    //jumps back to the last node with more than 2 options
+    
+    public void toLastNode(int x, int y) {
+        
+        if(degreeOfNode(x, y) > 2) {
+            maze[x][y] = "1";
+        } else {
+            maze[x][y] = "|";
+        }
+        
+        if(checkField(x + 1, y) == 4) {
+            toLastNode(x + 1, y);
+        } else if (checkField(x - 1, y) == 4) {
+            toLastNode(x + 1, y);
+        } else if (checkField(x, y + 1) == 4) {
+            toLastNode(x + 1, y);
+        } else if (checkField(x, y - 1) == 4) {
+            toLastNode(x, y - 1);
+        }
+    }
 }
