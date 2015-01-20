@@ -20,7 +20,7 @@ public class Main {
     static int widthTerminal;
     static int heightTerminal;
     static String levelName = "Level1.properties";
-    static int gameState = 1;
+    static int gameState = 0;
     static Screen screen;
     static int xZero;
     static int upperX;
@@ -53,26 +53,26 @@ public class Main {
         newScreenSize = screenSize;
 
         //sets up Window
-        if (gameState == 0) {
-            new MainMenu();
-            terminal.enterPrivateMode();
-        } else if (gameState == 1) {
-            terminal.enterPrivateMode();
-            readLevel(levelName);
-            drawView();
-            GameControls control = new GameControls();
-            while (true) {
-                control.readKeyInput();
-                updateView();
-                newScreenSize = terminal.getTerminalSize();
-                if ((screenSize.getRows() != newScreenSize.getRows() || (screenSize.getColumns() != newScreenSize.getColumns()))) {
-                    drawNewCutout();
-                    screenSize = newScreenSize;
+        while (true) {
+            if (gameState == 0) {
+                terminal.enterPrivateMode();
+                new MainMenu();
+            } else if (gameState == 1) {
+                readLevel(levelName);
+                drawView();
+                GameControls control = new GameControls();
+                while (true) {
+                    control.readKeyInput();
+                    updateView();
+                    newScreenSize = terminal.getTerminalSize();
+                    if ((screenSize.getRows() != newScreenSize.getRows() || (screenSize.getColumns() != newScreenSize.getColumns()))) {
+                        drawNewCutout();
+                        screenSize = newScreenSize;
+                    }
                 }
+
             }
-
         }
-
     }
 
     //reads level information in and processes it
@@ -280,7 +280,7 @@ public class Main {
 
          }
          */
-        for(DynamicObstacle mob : dynamicObjs) {
+        for (DynamicObstacle mob : dynamicObjs) {
 
             mob.randomMovement();
 
