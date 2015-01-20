@@ -32,7 +32,6 @@ public class Main {
     static boolean levelFinished;
     static TerminalSize screenSize;
     static TerminalSize newScreenSize;
-    static boolean normalMovement = true;
 
     static Object[][] maze;
     static ArrayList<DynamicObstacle> dynamicObjs = new ArrayList(50);
@@ -44,15 +43,15 @@ public class Main {
 
         terminal = TerminalFacade.createSwingTerminal();
         terminal.setCursorVisible(false);
-        
+
         screenSize = terminal.getTerminalSize();
         screen = TerminalFacade.createScreen();
         terminal.applyBackgroundColor(Terminal.Color.BLACK);
         widthTerminal = screenSize.getColumns();
         heightTerminal = screenSize.getRows();
-        
+
         newScreenSize = screenSize;
-        
+
         //sets up Window
         if (gameState == 0) {
             new MainMenu();
@@ -66,7 +65,7 @@ public class Main {
                 control.readKeyInput();
                 updateView();
                 newScreenSize = terminal.getTerminalSize();
-                if((screenSize.getRows() != newScreenSize.getRows() || (screenSize.getColumns() != newScreenSize.getColumns()))) {
+                if ((screenSize.getRows() != newScreenSize.getRows() || (screenSize.getColumns() != newScreenSize.getColumns()))) {
                     drawNewCutout();
                     screenSize = newScreenSize;
                 }
@@ -197,7 +196,6 @@ public class Main {
     }
 
     //updates positions in @param maze of moving objects and displays them on the terminal
-    
     public static void updateView() throws Exception {
 
         if (widthMaze <= widthTerminal && heightMaze <= heightTerminal) {
@@ -209,14 +207,13 @@ public class Main {
     }
 
     //updates xZero and yZero and draws a new cutout of the map on the terminal
-    
     public static void drawNewCutout() {
 
         int xCoordHero = hero.getxCoord();
         int yCoordHero = hero.getyCoord();
         widthTerminal = newScreenSize.getColumns();
         heightTerminal = newScreenSize.getRows();
-        
+
         boolean hasChanged = false;
 
         if (xCoordHero > xZero + widthTerminal) {
@@ -264,24 +261,31 @@ public class Main {
     }
 
     //handles @param hero and mob movements as well as health, keys and gameState
-    
     public static void generalUpdateView() throws Exception {
         TextModification.putChar('\u265B', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
         TextModification.printToTerminal("Lives left: " + lives, 1, 0);
         TextModification.printToTerminal("Keys collected: " + keysCollected + "/" + keysOfLevel, 16, 0);
-        
-        for(DynamicObstacle mob : dynamicObjs){
-            if(((mob.getxCoord() - hero.getxCoord()) <= 200)  && (mob.getyCoord() - hero.getyCoord() <= 200)) {
-                normalMovement = false;
-                mob.moveToHero();
-            } else if(((hero.getxCoord() - mob.getxCoord()) <= 200)  && ((hero.getyCoord() - mob.getxCoord()) <= 200)) {
-                normalMovement = false;
-                mob.moveToHero();
-            } else {
-                mob.randomMovement();
-            }
+
+        /*DynamicObstacle tmp;
+         try {
+         for (int indexX = hero.getxCoord() - 5; indexX < hero.getxCoord() + 5; indexX++) {
+         for (int indexY = hero.getyCoord() - 5; indexY < hero.getyCoord() + 5; indexY++) {
+         if (maze[indexX][indexY] instanceof DynamicObstacle) {
+         tmp = (DynamicObstacle) maze[indexX][indexY];
+         tmp.moveToHero();
+         }
+         }
+         }
+         } catch (ArrayIndexOutOfBoundsException e) {
+
+         }
+         */
+        for(DynamicObstacle mob : dynamicObjs) {
+
+            mob.randomMovement();
+
         }
-        
+
         if (lives == 0) {
             gameState = 0;
         }

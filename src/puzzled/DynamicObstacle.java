@@ -2,10 +2,11 @@ package puzzled;
 
 import java.util.ArrayList;
 import java.util.Random;
+import static puzzled.Main.heightTerminal;
 import static puzzled.Main.hero;
 import static puzzled.Main.lives;
 import static puzzled.Main.maze;
-import static puzzled.Main.normalMovement;
+import static puzzled.Main.widthTerminal;
 import static puzzled.Main.xZero;
 import static puzzled.Main.yZero;
 
@@ -15,6 +16,12 @@ public class DynamicObstacle {
     private int xCoord;
     private int yCoord;
     private ArrayList path = new ArrayList(80000);
+    static GameControls mobControl = new GameControls();
+    private boolean normalMovement = true;
+
+    public void setNormalMovement(boolean normalMovement) {
+        this.normalMovement = normalMovement;
+    }
 
     //getter and setter methods for coordinates to modify DynamicObstacle position
     public int getxCoord() {
@@ -40,41 +47,60 @@ public class DynamicObstacle {
 
     }
 
-    
     //handles mob movement when outside of 400*400 square surrounding @param hero
     public void randomMovement() {
-
-        GameControls mobControl = new GameControls();
 
         Random r = new Random();
         int random = r.nextInt();
 
-        while (normalMovement == true) {
-            switch (random % 2) {
-                case 0:
-                    if (mobControl.checkField(xCoord + 1, yCoord) == 4) {
-                        xCoord = xCoord + 1;
-                    } else if (mobControl.checkField(xCoord - 1, yCoord) == 4) {
-                        xCoord = xCoord - 1;
+        switch (random % 2) {
+            case 0:
+                if (mobControl.checkField(xCoord + 1, yCoord) == 4) {
+                    xCoord = xCoord + 1;
+                    if (inTerminalWindow(xCoord, yCoord)) {
+                        TextModification.putChar('\u0020', xCoord - 1, yCoord - yZero + 1);
+                        TextModification.putChar('\u3244', xCoord - xZero, yCoord - yZero + 1);
+                    }
+                } else if (mobControl.checkField(xCoord - 1, yCoord) == 4) {
+                    xCoord = xCoord - 1;
+                    if (inTerminalWindow(xCoord, yCoord)) {
+                        TextModification.putChar('\u0020', xCoord + 1, yCoord - yZero + 1);
+                        TextModification.putChar('\u3244', xCoord - xZero, yCoord - yZero + 1);
+                    }
+                } else {
+                    random = r.nextInt();
+                }
+                break;
+            case 1:
+                if (mobControl.checkField(xCoord, yCoord + 1) == 4) {
+                    yCoord = yCoord + 1;
+                    if (inTerminalWindow(xCoord, yCoord)) {
+                        TextModification.putChar('\u0020', xCoord, yCoord - yZero);
+                        TextModification.putChar('\u3244', xCoord - xZero, yCoord - yZero + 2);
+                    }
+                } else if (mobControl.checkField(xCoord, yCoord - 1) == 4) {
+                    yCoord = yCoord - 1;
+                    if (inTerminalWindow(xCoord, yCoord)) {
+                        TextModification.putChar('\u0020', xCoord, yCoord - yZero + 1);
+                        TextModification.putChar('\u3244', xCoord - xZero, yCoord - yZero);
                     } else {
                         random = r.nextInt();
                     }
                     break;
-                case 1:
-                    if (mobControl.checkField(xCoord, yCoord + 1) == 4) {
-                        yCoord = yCoord + 1;
-                    } else if (mobControl.checkField(xCoord, yCoord - 1) == 4) {
-                        yCoord = yCoord - 1;
-                    } else {
-                        random = r.nextInt();
-                    }
-                    break;
-            }
+                }
+
+        }
+    }
+
+    public boolean inTerminalWindow(int x, int y) {
+        if ((((x + xZero) > xZero) && ((x + xZero) < widthTerminal)) && (y + yZero > yZero) && (y + yZero < heightTerminal)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
     //loops drawPath() so that mob focusses on @param hero
-    
     public void moveToHero() {
         if (recPath(xCoord, yCoord) == true) {
             drawPath(xCoord, yCoord);
@@ -82,9 +108,7 @@ public class DynamicObstacle {
         normalMovement = true;
     }
 
-    
     //recursive function which follows the path laid out by recPath and moves mobs along the path of "1"s
-    
     public void drawPath(int x, int y) {
         xCoord = x;
         yCoord = y;
@@ -105,19 +129,14 @@ public class DynamicObstacle {
         }
 
     }
-    
-    //marks path to hero with String "1" and blocks off other ways from nodes with degrees > 2 with "|"
 
+    //marks path to hero with String "1" and blocks off other ways from nodes with degrees > 2 with "|"
     //TODO: FIX STACK OVERFLOW ERROR
-    
     public boolean recPath(int x, int y) {
 
         if (x == hero.getxCoord() && y == hero.getyCoord()) {
             return true;
         } else {
-
-            GameControls mobControl = new GameControls();
-
             if ((mobControl.checkField(x - 1, y) == 4) && (maze[x - 1][y] != "|")) {
                 maze[x - 1][y] = "1";
                 recPath(x - 1, y);
