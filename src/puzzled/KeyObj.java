@@ -1,7 +1,7 @@
 
 package puzzled;
 
-public class KeyObj {
+public class KeyObj extends Objects {
     
     //instantiable coordinates for KeyObj object
     

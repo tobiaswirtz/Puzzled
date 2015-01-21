@@ -15,7 +15,6 @@ import static puzzled.TextModification.xCentered;
 
 public class MainMenu {
 
-    
     int y = 8;
     boolean loop = true;
 
@@ -28,23 +27,20 @@ public class MainMenu {
 
     //loops the menu
     public void menuLoop() throws Exception {
-        
-        printToTerminal(xCentered(19), 5, "Welcome to Puzzled!", Terminal.Color.RED);
-        printToTerminal(xCentered(10), 8, "Start Game", Terminal.Color.WHITE);
-        printToTerminal(xCentered(9), 10, "Load Game", Terminal.Color.WHITE);
-        printToTerminal(xCentered(4), 12, "Help", Terminal.Color.WHITE);
-        printToTerminal(xCentered(4), 14, "Exit", Terminal.Color.WHITE);
-        selectOption(y);
-        
         while (loop == true) {
-
+            printToTerminal(xCentered(19), 5, "Welcome to Puzzled!", Terminal.Color.RED);
+            printToTerminal(xCentered(10), 8, "Start Game", Terminal.Color.WHITE);
+            printToTerminal(xCentered(9), 10, "Load Game", Terminal.Color.WHITE);
+            printToTerminal(xCentered(4), 12, "Help", Terminal.Color.WHITE);
+            printToTerminal(xCentered(4), 14, "Exit", Terminal.Color.WHITE);
+            selectOption(y);
             Key keyPressed = terminal.readInput();
 
             while (keyPressed == null) {
                 Thread.sleep(1);
                 keyPressed = terminal.readInput();
             }
-            
+
             switch (keyPressed.getKind()) {
                 case ArrowDown:
                     y += 2;
@@ -62,7 +58,7 @@ public class MainMenu {
 
     }
 
-    public void enterOption(int yInt) {
+    public void enterOption(int yInt) throws Exception {
 
         if (y > 14) {
             y = 8;
@@ -71,14 +67,18 @@ public class MainMenu {
         }
 
         if (y == 8) {
+            terminal.clearScreen();
             loop = false;
             gameState = 1;
         } else if (y == 10) {
-            //TODO
-        } else if( y == 12) {
-            //TODO: Legende
-        }
-        else if (y == 14) {
+            terminal.clearScreen();
+            loop = false;
+            new LoadMenu();
+        } else if (y == 12) {
+            terminal.clearScreen();
+            loop = false;
+            new HelpMenu();
+        } else if (y == 14) {
             System.exit(0);
         }
 

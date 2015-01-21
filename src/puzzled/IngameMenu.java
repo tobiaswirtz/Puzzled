@@ -2,6 +2,10 @@ package puzzled;
 
 import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.terminal.Terminal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import static puzzled.Main.drawNewCutout;
 import static puzzled.Main.drawView;
 import static puzzled.Main.gameState;
 import static puzzled.Main.terminal;
@@ -94,14 +98,21 @@ public class IngameMenu {
 
         if (y == 8) {
             loop = false;
+            terminal.clearScreen();
             drawView();
             updateView();
         } else if (y == 10) {
-            //TODO: Load Game
+            loop = false;
+            terminal.clearScreen();
+            new LoadMenu();
         } else if (y == 12) {
-            //TODO: Legende
+            terminal.clearScreen();
+            new HelpMenu();
         } else if (y == 14) {
-            //TODO: Save & Exit
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            Date date = new Date();
+            Main.saveGame(date);
+            System.exit(0);
         }
         else if (y == 16) {
             System.exit(0);

@@ -3,12 +3,16 @@ package puzzled;
 import com.googlecode.lanterna.input.Key;
 import static com.googlecode.lanterna.input.Key.Kind.ArrowDown;
 import com.googlecode.lanterna.terminal.swing.SwingTerminal;
+import static puzzled.Main.heightMaze;
+import static puzzled.Main.heightTerminal;
 import static puzzled.Main.hero;
 import static puzzled.Main.keysCollected;
 import static puzzled.Main.keysOfLevel;
 import static puzzled.Main.lives;
 import static puzzled.Main.maze;
 import static puzzled.Main.terminal;
+import static puzzled.Main.widthMaze;
+import static puzzled.Main.widthTerminal;
 import static puzzled.Main.xZero;
 import static puzzled.Main.yZero;
 
@@ -27,46 +31,88 @@ public class GameControls {
             keyPressed = terminal.readInput();
         }
         try {
-
-            switch (keyPressed.getKind()) {
-                case ArrowDown:
-                    if (checkField(hero.getxCoord(), hero.getyCoord()) == 2 || checkField(hero.getxCoord(), hero.getyCoord()) == 4) {
-                        TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
-                        hero.setyCoord(hero.getyCoord() + 1);
-                    } else if (checkField(hero.getxCoord(), hero.getyCoord()) == 1 || checkField(hero.getxCoord(), hero.getyCoord()) == 3) {
-                        lives--;
-                    }
-                    break;
-                case ArrowUp:
-                    if (checkField(hero.getxCoord(), hero.getyCoord() - 2) == 2 || checkField(hero.getxCoord(), hero.getyCoord() - 2) == 4) {
-                        TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
-                        hero.setyCoord(hero.getyCoord() - 1);
-                    } else if (checkField(hero.getxCoord(), hero.getyCoord() - 2) == 1 || checkField(hero.getxCoord(), hero.getyCoord() - 2) == 3) {
-                        lives--;
-                    }
-                    break;
-                case ArrowLeft:
-                    if (checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 2 || checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 4) {
-                        TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
-                        hero.setxCoord(hero.getxCoord() - 1);
-                    } else if (checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 1 || checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 3) {
-                        lives--;
-                    }
-                    break;
-                case ArrowRight:
-                    if (checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 2 || checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 4) {
-                        TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
-                        hero.setxCoord(hero.getxCoord() + 1);
-                    } else if (checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 1 || checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 3) {
-                        lives--;
-                    }
-                    break;
-                case Escape:
-                    terminal.clearScreen();
-                    new IngameMenu();
-                    break;
-                default:
-                    break;
+            if (widthMaze < widthTerminal && heightMaze < heightTerminal) {
+                switch (keyPressed.getKind()) {
+                    case ArrowDown:
+                        if (checkField(hero.getxCoord(), hero.getyCoord() + 1) == 2 || checkField(hero.getxCoord(), hero.getyCoord() + 1) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+                            hero.setyCoord(hero.getyCoord() + 1);
+                        } else if (checkField(hero.getxCoord(), hero.getyCoord() + 1) == 1 || checkField(hero.getxCoord(), hero.getyCoord() + 1) == 3) {
+                            lives--;
+                        }
+                        break;
+                    case ArrowUp:
+                        if (checkField(hero.getxCoord(), hero.getyCoord() - 1) == 2 || checkField(hero.getxCoord(), hero.getyCoord() - 1) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+                            hero.setyCoord(hero.getyCoord() - 1);
+                        } else if (checkField(hero.getxCoord(), hero.getyCoord() - 1) == 1 || checkField(hero.getxCoord(), hero.getyCoord() - 1) == 3) {
+                            lives--;
+                        }
+                        break;
+                    case ArrowLeft:
+                        if (checkField(hero.getxCoord() - 1, hero.getyCoord()) == 2 || checkField(hero.getxCoord() - 1, hero.getyCoord()) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+                            hero.setxCoord(hero.getxCoord() - 1);
+                        } else if (checkField(hero.getxCoord() - 1, hero.getyCoord()) == 1 || checkField(hero.getxCoord() - 1, hero.getyCoord()) == 3) {
+                            lives--;
+                        }
+                        break;
+                    case ArrowRight:
+                        if (checkField(hero.getxCoord() + 1, hero.getyCoord()) == 2 || checkField(hero.getxCoord() + 1, hero.getyCoord()) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() + xZero, hero.getyCoord() + yZero);
+                            hero.setxCoord(hero.getxCoord() + 1);
+                        } else if (checkField(hero.getxCoord() + 1, hero.getyCoord()) == 1 || checkField(hero.getxCoord() + 1, hero.getyCoord()) == 3) {
+                            lives--;
+                        }
+                        break;
+                    case Escape:
+                        terminal.clearScreen();
+                        new IngameMenu();
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                switch (keyPressed.getKind()) {
+                    case ArrowDown:
+                        if (checkField(hero.getxCoord(), hero.getyCoord()) == 2 || checkField(hero.getxCoord(), hero.getyCoord()) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
+                            hero.setyCoord(hero.getyCoord() + 1);
+                        } else if (checkField(hero.getxCoord(), hero.getyCoord()) == 1 || checkField(hero.getxCoord(), hero.getyCoord()) == 3) {
+                            lives--;
+                        }
+                        break;
+                    case ArrowUp:
+                        if (checkField(hero.getxCoord(), hero.getyCoord() - 2) == 2 || checkField(hero.getxCoord(), hero.getyCoord() - 2) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
+                            hero.setyCoord(hero.getyCoord() - 1);
+                        } else if (checkField(hero.getxCoord(), hero.getyCoord() - 2) == 1 || checkField(hero.getxCoord(), hero.getyCoord() - 2) == 3) {
+                            lives--;
+                        }
+                        break;
+                    case ArrowLeft:
+                        if (checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 2 || checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
+                            hero.setxCoord(hero.getxCoord() - 1);
+                        } else if (checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 1 || checkField(hero.getxCoord() - 1, hero.getyCoord() - 1) == 3) {
+                            lives--;
+                        }
+                        break;
+                    case ArrowRight:
+                        if (checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 2 || checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 4) {
+                            TextModification.putChar('\u0020', hero.getxCoord() - xZero, hero.getyCoord() - yZero + 1);
+                            hero.setxCoord(hero.getxCoord() + 1);
+                        } else if (checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 1 || checkField(hero.getxCoord() + 1, hero.getyCoord() - 1) == 3) {
+                            lives--;
+                        }
+                        break;
+                    case Escape:
+                        terminal.clearScreen();
+                        new IngameMenu();
+                        break;
+                    default:
+                        break;
+                }
             }
         } catch (Exception e) {
 

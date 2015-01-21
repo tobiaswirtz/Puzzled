@@ -1,16 +1,20 @@
 package puzzled;
 
+import com.googlecode.lanterna.terminal.Terminal;
 import java.util.ArrayList;
 import java.util.Random;
+import static puzzled.Main.heightMaze;
 import static puzzled.Main.heightTerminal;
 import static puzzled.Main.hero;
 import static puzzled.Main.lives;
 import static puzzled.Main.maze;
+import static puzzled.Main.terminal;
+import static puzzled.Main.widthMaze;
 import static puzzled.Main.widthTerminal;
 import static puzzled.Main.xZero;
 import static puzzled.Main.yZero;
 
-public class DynamicObstacle {
+public class DynamicObstacle extends Objects {
     //instantiable coordinates of Dynamic Obstacle objects
 
     private int xCoord;
@@ -58,14 +62,16 @@ public class DynamicObstacle {
                 if (mobControl.checkField(xCoord + 1, yCoord) == 4) {
                     xCoord = xCoord + 1;
                     if (inTerminalWindow(xCoord, yCoord)) {
-                        TextModification.putChar('\u0020', xCoord - 1, yCoord - yZero + 1);
-                        TextModification.putChar('\u3244', xCoord - xZero, yCoord - yZero + 1);
+                        TextModification.putChar('\u0020', xCoord + xZero - 1, yCoord + yZero);
+                        TextModification.putChar('\u2658', xCoord + xZero, yCoord + yZero, Terminal.Color.BLUE);
+                        terminal.applyForegroundColor(Terminal.Color.DEFAULT);
                     }
                 } else if (mobControl.checkField(xCoord - 1, yCoord) == 4) {
                     xCoord = xCoord - 1;
                     if (inTerminalWindow(xCoord, yCoord)) {
-                        TextModification.putChar('\u0020', xCoord + 1, yCoord - yZero + 1);
-                        TextModification.putChar('\u3244', xCoord - xZero, yCoord - yZero + 1);
+                        TextModification.putChar('\u0020', xCoord + 1, yCoord + yZero);
+                        TextModification.putChar('\u2658', xCoord + xZero, yCoord + yZero + 1, Terminal.Color.BLUE);
+                        terminal.applyForegroundColor(Terminal.Color.DEFAULT);
                     }
                 } else {
                     random = r.nextInt();
@@ -75,14 +81,16 @@ public class DynamicObstacle {
                 if (mobControl.checkField(xCoord, yCoord + 1) == 4) {
                     yCoord = yCoord + 1;
                     if (inTerminalWindow(xCoord, yCoord)) {
-                        TextModification.putChar('\u0020', xCoord, yCoord - yZero);
-                        TextModification.putChar('\u3244', xCoord - xZero, yCoord - yZero + 2);
+                        TextModification.putChar('\u0020', xCoord + xZero, yCoord + yZero - 1);
+                        TextModification.putChar('\u2658', xCoord + xZero, yCoord + yZero, Terminal.Color.BLUE);
+                        terminal.applyForegroundColor(Terminal.Color.DEFAULT);
                     }
                 } else if (mobControl.checkField(xCoord, yCoord - 1) == 4) {
                     yCoord = yCoord - 1;
                     if (inTerminalWindow(xCoord, yCoord)) {
-                        TextModification.putChar('\u0020', xCoord, yCoord - yZero + 1);
-                        TextModification.putChar('\u3244', xCoord - xZero, yCoord - yZero);
+                        TextModification.putChar('\u0020', xCoord + xZero, yCoord + yZero + 1);
+                        TextModification.putChar('\u2658', xCoord + xZero, yCoord + yZero, Terminal.Color.BLUE);
+                        terminal.applyForegroundColor(Terminal.Color.DEFAULT);
                     } else {
                         random = r.nextInt();
                     }
@@ -93,10 +101,18 @@ public class DynamicObstacle {
     }
 
     public boolean inTerminalWindow(int x, int y) {
-        if ((((x + xZero) > xZero) && ((x + xZero) < widthTerminal)) && (y + yZero > yZero) && (y + yZero < heightTerminal)) {
+        if(widthMaze < widthTerminal && heightMaze < heightTerminal) {
+        if ((((x + xZero) > xZero) && ((x + xZero) < xZero + widthTerminal)) && (y + yZero > yZero) && (y + yZero < yZero + heightTerminal)) {
             return true;
         } else {
             return false;
+        }
+        } else {
+            if(((xZero + (x - xZero) > xZero) && ((x + xZero) < xZero + widthTerminal)) && (yZero + (y - yZero) > yZero) && (yZero + y < yZero + heightTerminal)) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

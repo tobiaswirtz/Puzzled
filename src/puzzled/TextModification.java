@@ -16,6 +16,11 @@ public class TextModification {
         terminal.putCharacter(input);
     }
     
+    public static void putChar(char input, int x, int y, Color color) {
+        terminal.applyForegroundColor(color);
+        putChar(input, x, y);
+    }
+    
     //allows for insertion of strings at coordinates x, y
     
     public static void printToTerminal(String input, int x, int y) {

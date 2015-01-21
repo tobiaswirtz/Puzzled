@@ -1,6 +1,6 @@
 package puzzled;
 
-public class Wall {
+public class Wall extends Objects{
     
     //instantiable coordinates of Wall objects
     

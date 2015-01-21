@@ -1,7 +1,7 @@
 
 package puzzled;
 
-public class StaticObstacle {
+public class StaticObstacle extends Objects {
     
     //instantiable coordinates for StaticObstacle object
     

@@ -1,7 +1,7 @@
 
 package puzzled;
 
-public class Exit {
+public class Exit extends Objects {
     
     //instantiable coordinates of Exit object
     

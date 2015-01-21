@@ -1,7 +1,7 @@
 
 package puzzled;
 
-public class Entrance {
+public class Entrance extends Objects {
     
     //instantiable coordinates of maze entrances
     
